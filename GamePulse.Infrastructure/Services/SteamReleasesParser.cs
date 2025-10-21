@@ -24,6 +24,7 @@ namespace GamePulse.Infrastructure.Services
         {
             var gameIds = new List<long>();
             int page = 1;
+            bool foundTargetMonth = false;
 
             while (true)
             {
@@ -40,8 +41,6 @@ namespace GamePulse.Infrastructure.Services
 
                 if (gameLinks.Count == 0) break;
 
-                var pageIds = new List<long>();
-
                 foreach (var gameLink in gameLinks)
                 {
                     var releaseDateNode = gameLink.SelectSingleNode(".//div[contains(@class, 'search_released')]");
@@ -50,18 +49,19 @@ namespace GamePulse.Infrastructure.Services
 
                     if (IsTargetMonth(releaseDateText, month))
                     {
+                        foundTargetMonth = true;
+
                         var appIdStr = gameLink.GetAttributeValue("data-ds-appid", "");
 
                         if (long.TryParse(appIdStr, out long appId))
                         {
-                            pageIds.Add(appId);
+                            gameIds.Add(appId);
                         }
                     }
-                }
-
-                if (pageIds.Count > 0)
-                {
-                    gameIds.AddRange(pageIds);
+                    else if (foundTargetMonth && IsLaterMonth(releaseDateText, month))
+                    {
+                        break;
+                    }
                 }
 
                 page++;
@@ -80,21 +80,20 @@ namespace GamePulse.Infrastructure.Services
                            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
             var targetMonthName = monthNames[targetMonth - 1];
-
-            return releaseDateText.ToLower().Contains(targetMonthName.ToLower());
+            return releaseDateText.Contains(targetMonthName) && releaseDateText.Contains("2025");
         }
 
-        private bool IsFutureMonth(string releaseDateText, int targetMonth)
+        private bool IsLaterMonth(string releaseDateText, int targetMonth)
         {
             if (string.IsNullOrEmpty(releaseDateText)) return false;
 
             var monthNames = new[] { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
                            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
-            for (int futureMonth = targetMonth + 1; futureMonth <= 12; futureMonth++)
+            for (int laterMonth = targetMonth + 1; laterMonth <= 12; laterMonth++)
             {
-                var futureMonthName = monthNames[futureMonth - 1];
-                if (releaseDateText.Contains(futureMonthName) && releaseDateText.Contains("2025"))
+                var laterMonthName = monthNames[laterMonth - 1];
+                if (releaseDateText.Contains(laterMonthName) && releaseDateText.Contains("2025"))
                     return true;
             }
 

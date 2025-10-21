@@ -1,0 +1,27 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace GamePulse.Core.Entites
+{
+    public class Game : EntityBase
+    {
+        public long SteamAppGameId { get; set; }
+
+        public string GameName { get; set; } = string.Empty;
+
+        public DateTime DateOfRelease { get; set; }
+
+        public string ShopRef { get; set; } = string.Empty;
+
+        public string ImageRef { get; set; } = string.Empty;
+
+        public string ShortDescription { get; set; } = string.Empty;
+
+        public List<Platform> SupportedPlatforms { get; set; }
+
+        public GameInfo GameInfo { get; set; }
+    }
+}

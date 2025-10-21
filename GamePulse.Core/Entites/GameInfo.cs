@@ -8,12 +8,16 @@ namespace GamePulse.Core.Entites
 {
     public class GameInfo : EntityBase
     {
-        public string GameName { get; set; } = string.Empty;
+        public DateTime DateOfSearch { get; set; }
 
-        public DateTime DateOfRelease { get; set; }
+        public long FollowersCount { get; set; }
 
-        public string ShopRef { get; set; } = string.Empty;
+        public List<Genre> Genres { get; set; }
 
-        public string ImageRef { get; set; } = string.Empty;
+        public List<Tag> Tags { get; set; }
+
+        public Game Game { get; set; }
+
+        public Guid GameId { get; set; }
     }
 }

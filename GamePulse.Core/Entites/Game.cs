@@ -12,7 +12,7 @@ namespace GamePulse.Core.Entites
 
         public string GameName { get; set; } = string.Empty;
 
-        public DateTime DateOfRelease { get; set; }
+        public string DateOfRelease { get; set; } = string.Empty;
 
         public string ShopRef { get; set; } = string.Empty;
 
@@ -20,7 +20,11 @@ namespace GamePulse.Core.Entites
 
         public string ShortDescription { get; set; } = string.Empty;
 
-        public List<Platform> SupportedPlatforms { get; set; }
+        public bool IsWindowsSupported { get; set; }
+
+        public bool IsLinuxSupported { get; set; }
+
+        public bool IsMacSupported { get; set; }
 
         public GameInfo GameInfo { get; set; }
     }

@@ -20,11 +20,22 @@ namespace GamePulse.Infrastructure.Services
             _httpClient = httpClient;
             _releasesParser = releasesParser;
             _logger = logger;
+
+            if (!_httpClient.DefaultRequestHeaders.Contains("User-Agent"))
+            {
+                _httpClient.DefaultRequestHeaders.Add("User-Agent",
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
+            }
         }
 
         private readonly IReleasesParser _releasesParser;
         private readonly ILogger<SteamApiGameParser> _logger;
         private readonly HttpClient _httpClient;
+        private static readonly string[] UserAgents = {
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"
+        };
 
         public async Task<List<Game>> GetGamesFromApiAsync(int month)
         {
@@ -49,11 +60,11 @@ namespace GamePulse.Infrastructure.Services
 
                         if (!string.IsNullOrEmpty(jsonResponseString))
                         {
-                            SteamGameResponse? steamGameResponse = JsonSerializer.Deserialize<SteamGameResponse>(jsonResponseString);
+                            var steamGameResponse = JsonSerializer.Deserialize<Dictionary<string, SteamGameResponse>>(jsonResponseString);
 
                             if (steamGameResponse != null)
                             {
-                                SteamGameData? steamGameData = steamGameResponse?.Data?.Values.FirstOrDefault();
+                                SteamGameData? steamGameData = steamGameResponse?.Values.FirstOrDefault()?.Data;
 
                                 if (steamGameData != null)
                                 {
@@ -107,6 +118,12 @@ namespace GamePulse.Infrastructure.Services
                     {
                         _logger.LogWarning("HTTP request failed for game ID: {GameId}. Status: {StatusCode}", id, response.StatusCode);
                     }
+
+                    await Task.Delay(100);
+
+                    _httpClient.DefaultRequestHeaders.Remove("User-Agent");
+                    _httpClient.DefaultRequestHeaders.Add("User-Agent",
+                        UserAgents[Random.Shared.Next(UserAgents.Length)]);
                 }
 
                 _logger.LogInformation("Completed processing {TotalGames} games for month {Month}", parsedGames.Count, month);

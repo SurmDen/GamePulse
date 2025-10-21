@@ -10,10 +10,21 @@ namespace GamePulse.Infrastructure.Services
         {
             _httpClient = httpClient;
             _logger = logger;
+
+            if (!_httpClient.DefaultRequestHeaders.Contains("User-Agent"))
+            {
+                _httpClient.DefaultRequestHeaders.Add("User-Agent",
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
+            }
         }
 
         private readonly HttpClient _httpClient;
         private readonly ILogger<SteamReleasesParser> _logger;
+        private static readonly string[] UserAgents = {
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"
+        };
 
         public async Task<List<long>> GetReleaseGamesIdsAsync(int month)
         {
@@ -98,8 +109,14 @@ namespace GamePulse.Infrastructure.Services
                     }
 
                     page++;
+
                     _logger.LogDebug("Waiting before next page request...");
-                    await Task.Delay(100);
+
+                    await Task.Delay(200);
+
+                    _httpClient.DefaultRequestHeaders.Remove("User-Agent");
+                    _httpClient.DefaultRequestHeaders.Add("User-Agent",
+                        UserAgents[Random.Shared.Next(UserAgents.Length)]);
                 }
                 catch (Exception ex)
                 {

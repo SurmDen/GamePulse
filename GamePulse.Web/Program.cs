@@ -1,3 +1,4 @@
+using GamePulse.Core.Entites;
 using GamePulse.Core.Interfaces;
 using GamePulse.Infrastructure.Services;
 
@@ -9,11 +10,11 @@ builder.Services.AddScoped<IGameParser, SteamApiGameParser>();
 
 var app = builder.Build();
 
-app.MapGet("/", async (IReleasesParser parser, HttpContext context) =>
+app.MapGet("/", async (IGameParser parser, HttpContext context) =>
 {
-    List<long> Ids = await parser.GetReleaseGamesIdsAsync(11);
+    List<Game> games = await parser.GetGamesFromApiAsync(10);
 
-    await context.Response.WriteAsJsonAsync(Ids);
+    await context.Response.WriteAsJsonAsync(games);
 });
 
 app.Run();

@@ -9,11 +9,24 @@ namespace GamePulse.Core.Models
 {
     public class SteamGameResponse
     {
-        public Dictionary<string, SteamGameData>? Data { get; set; }
+        [JsonPropertyName("success")]
+        public bool Success { get; set; }
+
+        [JsonPropertyName("data")]
+        public SteamGameData? Data { get; set; }
     }
 
     public class SteamGameData
     {
+        [JsonPropertyName("type")]
+        public string? Type { get; set; }
+
+        [JsonPropertyName("required_age")]
+        public int RequiredAge { get; set; }
+
+        [JsonPropertyName("is_free")]
+        public bool IsFree { get; set; }
+
         [JsonPropertyName("steam_appid")]
         public int AppId { get; set; }
 

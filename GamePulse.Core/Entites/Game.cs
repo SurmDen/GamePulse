@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,5 +32,8 @@ namespace GamePulse.Core.Entites
         public List<Tag> Tags { get; set; }
 
         public List<GameInfo> DatedGameInfo { get; set; }
+
+        [NotMapped]
+        public long Followers { get; set; }
     }
 }

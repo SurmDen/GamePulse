@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace GamePulse.Core.Interfaces.Repositories
 {
-    public interface IGameRepository
+    public interface IUserRepository
     {
-        public Task AddGamesAsync(List<Game> games);
+        public Task CreateUserAsync(string name, string email, string password);
 
-        public Task<List<Game>> GetGamesAsync(int month, Guid? tagId = null, string? platform = null);
+        public Task<User> GetUserByPasswordAndEmailAsync(string email, string password);
     }
 }

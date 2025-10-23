@@ -85,15 +85,7 @@ namespace GamePulse.Infrastructure.Services
                                         {
                                             SteamAppTagId = c.Id,
                                             TagName = c.Description
-                                        })),
-                                        DatedGameInfo = new List<GameInfo>()
-                                        {
-                                            new GameInfo()
-                                            {
-                                                FollowersCount = 0,
-                                                DateOfSearch = DateTime.Now.Date
-                                            }
-                                        }
+                                        }))
                                     };
 
                                     parsedGames.Add(game);

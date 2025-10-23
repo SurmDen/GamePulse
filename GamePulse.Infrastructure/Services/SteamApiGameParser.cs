@@ -1,22 +1,17 @@
 ﻿using GamePulse.Core.Entites;
 using GamePulse.Core.Interfaces;
+using GamePulse.Core.Interfaces.Services;
 using GamePulse.Core.Models;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Net.Http.Json;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace GamePulse.Infrastructure.Services
 {
     public class SteamApiGameParser : IGameParser
     {
-        public SteamApiGameParser(IReleasesParser releasesParser, ILogger<SteamApiGameParser> logger, HttpClient httpClient)
+        public SteamApiGameParser(IReleasesParser releasesParser, ILogger<SteamApiGameParser> logger, HttpClient httpClient, IDateParser dateParser)
         {
+            _dateParser = dateParser;
             _httpClient = httpClient;
             _releasesParser = releasesParser;
             _logger = logger;
@@ -28,6 +23,7 @@ namespace GamePulse.Infrastructure.Services
             }
         }
 
+        private readonly IDateParser _dateParser;
         private readonly IReleasesParser _releasesParser;
         private readonly ILogger<SteamApiGameParser> _logger;
         private readonly HttpClient _httpClient;
@@ -73,7 +69,7 @@ namespace GamePulse.Infrastructure.Services
                                     {
                                         SteamAppGameId = steamGameData.AppId,
                                         GameName = steamGameData.Name,
-                                        DateOfRelease = steamGameData.ReleaseDate.Date,
+                                        DateOfRelease = _dateParser.ParseDateFromString(steamGameData.ReleaseDate.Date),
                                         ShopRef = steamGameData.Website,
                                         ImageRef = steamGameData.HeaderImage,
                                         ShortDescription = steamGameData.ShortDescription,

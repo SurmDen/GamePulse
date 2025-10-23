@@ -12,7 +12,7 @@ namespace GamePulse.Core.Entites
 
         public string GameName { get; set; } = string.Empty;
 
-        public string DateOfRelease { get; set; } = string.Empty;
+        public DateTime DateOfRelease { get; set; }
 
         public string ShopRef { get; set; } = string.Empty;
 

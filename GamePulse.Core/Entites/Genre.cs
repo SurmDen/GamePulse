@@ -12,6 +12,6 @@ namespace GamePulse.Core.Entites
 
         public long SteamAppGenreId { get; set; }
 
-        public List<GameInfo> GameInfoModels { get; set; }
+        public List<Game> Games { get; set; }
     }
 }

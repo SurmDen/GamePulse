@@ -80,19 +80,23 @@ namespace GamePulse.Infrastructure.Services
                                         IsLinuxSupported = steamGameData.Platforms.Linux,
                                         IsMacSupported = steamGameData.Platforms.Mac,
                                         IsWindowsSupported = steamGameData.Platforms.Windows,
-                                        GameInfo = new GameInfo()
+                                        Genres = new List<Genre>(steamGameData.Genres.Select(g => new Genre()
                                         {
-                                            DateOfSearch = DateTime.Now.Date,
-                                            Genres = new List<Genre>(steamGameData.Genres.Select(g => new Genre()
+                                            SteamAppGenreId = long.Parse(g.Id),
+                                            GenreName = g.Description
+                                        })),
+                                        Tags = new List<Tag>(steamGameData.Categories.Select(c => new Tag()
+                                        {
+                                            SteamAppTagId = c.Id,
+                                            TagName = c.Description
+                                        })),
+                                        DatedGameInfo = new List<GameInfo>()
+                                        {
+                                            new GameInfo()
                                             {
-                                                SteamAppGenreId = long.Parse(g.Id),
-                                                GenreName = g.Description
-                                            })),
-                                            Tags = new List<Tag>(steamGameData.Categories.Select(c => new Tag()
-                                            {
-                                                SteamAppTagId = c.Id,
-                                                TagName = c.Description
-                                            }))
+                                                FollowersCount = 0,
+                                                DateOfSearch = DateTime.Now.Date
+                                            }
                                         }
                                     };
 

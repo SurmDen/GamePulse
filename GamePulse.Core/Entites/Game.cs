@@ -26,6 +26,10 @@ namespace GamePulse.Core.Entites
 
         public bool IsMacSupported { get; set; }
 
-        public GameInfo GameInfo { get; set; }
+        public List<Genre> Genres { get; set; }
+
+        public List<Tag> Tags { get; set; }
+
+        public List<GameInfo> DatedGameInfo { get; set; }
     }
 }

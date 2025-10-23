@@ -12,6 +12,6 @@ namespace GamePulse.Core.Entites
 
         public string TagName { get; set; } = string.Empty;
 
-        public List<GameInfo> GameInfoModels { get; set; }
+        public List<Game> Games { get; set; }
     }
 }

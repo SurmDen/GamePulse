@@ -10,4 +10,12 @@
     <ProjectReference Include="..\GamePulse.Core\GamePulse.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Commands\Game\" />
+    <Folder Include="Commands\User\" />
+    <Folder Include="Commands\Genre\" />
+    <Folder Include="Queries\" />
+    <Folder Include="DTOs\" />
+  </ItemGroup>
+
 </Project>

@@ -14,8 +14,10 @@
     <Folder Include="Commands\Game\" />
     <Folder Include="Commands\User\" />
     <Folder Include="Commands\Genre\" />
-    <Folder Include="Queries\" />
-    <Folder Include="DTOs\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="13.0.0" />
   </ItemGroup>
 
 </Project>

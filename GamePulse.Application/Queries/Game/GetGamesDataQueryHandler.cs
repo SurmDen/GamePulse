@@ -1,6 +1,7 @@
 ﻿using GamePulse.Application.DTOs.Game;
 using GamePulse.Core.Interfaces.Repositories;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,30 +12,48 @@ namespace GamePulse.Application.Queries.Game
 {
     public class GetGamesDataQueryHandler : IRequestHandler<GetGamesDataQuery, List<GameDto>>
     {
-        public GetGamesDataQueryHandler(IGameRepository gameRepository)
+        private readonly IGameRepository _gameRepository;
+        private readonly ILogger<GetGamesDataQueryHandler> _logger;
+
+        public GetGamesDataQueryHandler(IGameRepository gameRepository, ILogger<GetGamesDataQueryHandler> logger)
         {
             _gameRepository = gameRepository;
+            _logger = logger;
         }
-
-        private readonly IGameRepository _gameRepository;
 
         public async Task<List<GameDto>> Handle(GetGamesDataQuery request, CancellationToken cancellationToken)
         {
-            var games = await _gameRepository.GetGamesAsync(request.Month, request.TagId, request.Platform);
+            _logger.LogInformation("Getting games data for month {Month}, tag: {TagId}, platform: {Platform}",
+                request.Month, request.TagId, request.Platform);
 
-            var gameDtos = games.Select(g => new GameDto()
+            try
             {
-                Id = g.Id,
-                SteamAppGameId = g.SteamAppGameId,
-                GameName = g.GameName,
-                DateOfRelease = g.DateOfRelease,
-                ImageRef = g.ImageRef,
-                ShopRef = g.ShopRef,
-                ShortDescription = g.ShortDescription
+                var games = await _gameRepository.GetGamesAsync(request.Month, request.TagId, request.Platform);
 
-            });
+                _logger.LogDebug("Retrieved {GameCount} games from repository", games.Count);
 
-            return gameDtos.ToList();
+                var gameDtos = games.Select(g => new GameDto()
+                {
+                    Id = g.Id,
+                    SteamAppGameId = g.SteamAppGameId,
+                    GameName = g.GameName,
+                    DateOfRelease = g.DateOfRelease,
+                    ImageRef = g.ImageRef,
+                    ShopRef = g.ShopRef,
+                    ShortDescription = g.ShortDescription
+                });
+
+                var result = gameDtos.ToList();
+
+                _logger.LogInformation("Successfully mapped {GameDtoCount} game DTOs", result.Count);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting games data");
+                throw;
+            }
         }
     }
 }

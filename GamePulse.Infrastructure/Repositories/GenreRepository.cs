@@ -19,23 +19,30 @@ namespace GamePulse.Infrastructure.Repositories
 
         private readonly ApplicationDbContext _context;
 
-        public async Task<List<Genre>> GetTopGenresWithGamesAsync(int genresCount)
+        public async Task<List<Genre>> GetTopGenresWithGamesAsync(int genresCount, int year = 0, int month = 0)
         {
-            var genres = _context.Genres
+            var query = _context.Genres
                 .Include(g => g.Games)
+                    .ThenInclude(g => g.DatedGameInfo)
                 .AsNoTracking();
 
-            genres = genres.OrderByDescending(g => g.Games.Count()).Take(genresCount);
-
-            foreach (var genre in genres)
+            if (year > 0 && month > 0)
             {
-                foreach (var game in genre.Games)
+                query = query.Select(g => new Genre
                 {
-                    game.Genres = null;
-                }
+                    Id = g.Id,
+                    GenreName = g.GenreName,
+                    SteamAppGenreId = g.SteamAppGenreId,
+                    Games = g.Games.Where(game => game.DateOfRelease.Year == year && game.DateOfRelease.Month == month).ToList()
+                });
             }
 
-            return await genres.ToListAsync();
+            var genres = await query
+                .OrderByDescending(g => g.Games.Count)
+                .Take(genresCount)
+                .ToListAsync();
+
+            return genres;
         }
     }
 }

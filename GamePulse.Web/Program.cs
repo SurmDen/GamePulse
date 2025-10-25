@@ -1,4 +1,5 @@
 using GamePulse.Application.Interfaces;
+using GamePulse.Application.Queries.User;
 using GamePulse.Core.Interfaces;
 using GamePulse.Core.Interfaces.Repositories;
 using GamePulse.Core.Interfaces.Services;
@@ -25,6 +26,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddMediatR(config =>
 {
     config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+    config.RegisterServicesFromAssembly(typeof(GetUserQuery).Assembly);
 });
 
 builder.Services.AddSwaggerGen(c =>
@@ -70,7 +72,7 @@ builder.Services.AddTransient<IReleasesParser, SteamReleasesParser>();
 builder.Services.AddTransient<IGameParser, SteamApiGameParser>();
 
 //added background service for message consuming
-builder.Services.AddHostedService<KafkaConsumeService>();
+//builder.Services.AddHostedService<KafkaConsumeService>();
 // registered services for producing messages
 builder.Services.AddSingleton<IMessageProduceService, KafkaProduceService>();
 

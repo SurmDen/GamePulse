@@ -30,7 +30,7 @@ namespace GamePulse.Infrastructure.Services
                  new Claim(ClaimTypes.Name, user.UserName),
             };
 
-            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Key"]));
+            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Key"] ?? throw new InvalidOperationException("security key was null")));
 
             var credentials = new SigningCredentials(secretKey, "HS256");
 

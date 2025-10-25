@@ -1,5 +1,6 @@
 ﻿using GamePulse.Core.Entites;
 using GamePulse.Core.Interfaces.Services;
+using GamePulse.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -11,11 +12,9 @@ namespace GamePulse.Infrastructure.Data
 {
     public class ApplicationDbContext : DbContext
     {
-        private readonly IPasswordHasher _passwordHasher;
-
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IPasswordHasher passwordHasher) : base (options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base (options)
         {
-            _passwordHasher = passwordHasher;
+            Database.EnsureCreated();
         }
 
         public DbSet<Game> Games { get; set; }
@@ -57,7 +56,7 @@ namespace GamePulse.Infrastructure.Data
                     Id = Guid.NewGuid(),
                     UserEmail = "surm@den",
                     UserName = "surman",
-                    PasswordHash = _passwordHasher.GetHash("123456")
+                    PasswordHash = new SHA256Hasher().GetHash("123456")
                 });
             });
         }

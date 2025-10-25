@@ -1,7 +1,9 @@
+using GamePulse.Application.Interfaces;
 using GamePulse.Core.Interfaces;
 using GamePulse.Core.Interfaces.Repositories;
 using GamePulse.Core.Interfaces.Services;
 using GamePulse.Infrastructure.Extentions;
+using GamePulse.Infrastructure.MessageBus;
 using GamePulse.Infrastructure.Repositories;
 using GamePulse.Infrastructure.Services;
 using Microsoft.OpenApi.Models;
@@ -66,6 +68,11 @@ builder.Services.AddTransient<IPasswordHasher, SHA256Hasher>();
 builder.Services.AddTransient<IReleasesParser, SteamReleasesParser>();
 // getting game info by GameId from api
 builder.Services.AddTransient<IGameParser, SteamApiGameParser>();
+
+//added background service for message consuming
+builder.Services.AddHostedService<KafkaConsumeService>();
+// registered services for producing messages
+builder.Services.AddSingleton<IMessageProduceService, KafkaProduceService>();
 
 var app = builder.Build();
 

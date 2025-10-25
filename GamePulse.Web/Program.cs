@@ -72,7 +72,7 @@ builder.Services.AddTransient<IReleasesParser, SteamReleasesParser>();
 builder.Services.AddTransient<IGameParser, SteamApiGameParser>();
 
 //added background service for message consuming
-//builder.Services.AddHostedService<KafkaConsumeService>();
+builder.Services.AddHostedService<KafkaConsumeService>();
 // registered services for producing messages
 builder.Services.AddSingleton<IMessageProduceService, KafkaProduceService>();
 

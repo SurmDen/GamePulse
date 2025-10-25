@@ -21,9 +21,6 @@ namespace GamePulse.Core.Models
         [JsonPropertyName("type")]
         public string? Type { get; set; }
 
-        [JsonPropertyName("required_age")]
-        public int RequiredAge { get; set; }
-
         [JsonPropertyName("is_free")]
         public bool IsFree { get; set; }
 

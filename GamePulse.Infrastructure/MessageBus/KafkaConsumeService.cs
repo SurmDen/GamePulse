@@ -3,6 +3,7 @@ using GamePulse.Application.Events;
 using GamePulse.Core.Interfaces;
 using GamePulse.Core.Interfaces.Repositories;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -16,73 +17,97 @@ namespace GamePulse.Infrastructure.MessageBus
 {
     public class KafkaConsumeService : BackgroundService
     {
-        public KafkaConsumeService(IGameParser gameParser, IGameRepository gameRepository, ILogger<KafkaConsumeService> logger, IConfiguration configuration)
+        private readonly IServiceProvider _serviceProvider;
+        private readonly IConsumer<string, string>? _consumer;
+        private readonly ILogger<KafkaConsumeService> _logger;
+
+        public KafkaConsumeService(
+            IServiceProvider serviceProvider,
+            ILogger<KafkaConsumeService> logger,
+            IConfiguration configuration)
         {
+            _serviceProvider = serviceProvider;
+            _logger = logger;
+
             try
             {
-                _gameParser = gameParser;
-                _gameRepository = gameRepository;
-                _logger = logger;
-
                 var config = new ConsumerConfig()
                 {
                     GroupId = configuration["Kafka:GroupId"] ?? "GamePulseGroup",
-                    BootstrapServers = configuration["Kafka:Server"] ?? throw new InvalidOperationException("invalid kafka server")
+                    BootstrapServers = configuration["Kafka:Server"] ?? "localhost:9092",
+                    AutoOffsetReset = AutoOffsetReset.Earliest
                 };
 
                 _consumer = new ConsumerBuilder<string, string>(config).Build();
+                _logger.LogInformation("✅ Kafka Consumer создан успешно");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occured while trying to connect Kafka");
-
-                throw;
+                _logger.LogError(ex, "❌ Ошибка создания Kafka Consumer");
+                _consumer = null;
             }
         }
 
-        private readonly IGameRepository _gameRepository;
-        private readonly IGameParser _gameParser;
-        private readonly IConsumer<string, string> _consumer;
-        private readonly ILogger<KafkaConsumeService> _logger;
-
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            const string topicName = "game-searching";
+            await Task.Delay(5000, stoppingToken);
 
-            _consumer.Subscribe(topicName);
-
-            _logger.LogInformation($"Start consume for {topicName}");
-
-            while (!stoppingToken.IsCancellationRequested)
+            if (_consumer == null)
             {
-                try
+                _logger.LogWarning("⚠️ Kafka Consumer не создан, сервис останавливается");
+                return;
+            }
+
+            try
+            {
+                _consumer.Subscribe("game-searching");
+                _logger.LogInformation("👂 Start consume for game-searching");
+
+                while (!stoppingToken.IsCancellationRequested)
                 {
-                    var message = _consumer.Consume(1000);
-
-                    if (message != null)
+                    try
                     {
-                        GameSearchEvent? searchEvent = JsonSerializer.Deserialize<GameSearchEvent>(message.Message.Value);
+                        var message = _consumer.Consume(1000);
 
-                        if (searchEvent != null)
+                        if (message != null)
                         {
-                            await _gameRepository.AddGamesAsync(await _gameParser.GetGamesFromApiAsync(searchEvent.NeededMonth));
-                        }
-                        else
-                        {
-                            _logger.LogWarning($"message parsing error {typeof(GameSearchEvent)}");
+                            _logger.LogInformation("📨 Получено сообщение: {Message}", message.Message.Value);
+
+                            GameSearchEvent? searchEvent = JsonSerializer.Deserialize<GameSearchEvent>(message.Message.Value);
+
+                            if (searchEvent != null)
+                            {
+                                using (var scope = _serviceProvider.CreateScope())
+                                {
+                                    IGameParser gameParser = scope.ServiceProvider.GetRequiredService<IGameParser>();
+                                    IGameRepository gameRepository = scope.ServiceProvider.GetRequiredService<IGameRepository>();
+
+                                    var games = await gameParser.GetGamesFromApiAsync(searchEvent.NeededMonth);
+
+                                    await gameRepository.AddGamesAsync(games);
+                                }
+                            }
+                            else
+                            {
+                                _logger.LogWarning($"message parsing error {typeof(GameSearchEvent)}");
+                            }
                         }
                     }
-                    else
+                    catch (ConsumeException ex)
                     {
-                        _logger.LogWarning($"Message from {topicName} was null");
+                        _logger.LogError(ex, "❌ Ошибка потребления сообщения");
+                        await Task.Delay(5000, stoppingToken);
                     }
                 }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Cunsumer error ocured");
-
-                    throw;
-                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Критическая ошибка в Kafka Consumer");
+            }
+            finally
+            {
+                _consumer?.Close();
+                _consumer?.Dispose();
             }
         }
     }

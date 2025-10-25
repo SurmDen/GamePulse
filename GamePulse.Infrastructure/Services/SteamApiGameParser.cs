@@ -111,7 +111,7 @@ namespace GamePulse.Infrastructure.Services
                         _logger.LogWarning("HTTP request failed for game ID: {GameId}. Status: {StatusCode}", id, response.StatusCode);
                     }
 
-                    await Task.Delay(100);
+                    await Task.Delay(1000);
 
                     _httpClient.DefaultRequestHeaders.Remove("User-Agent");
                     _httpClient.DefaultRequestHeaders.Add("User-Agent",

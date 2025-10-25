@@ -51,8 +51,9 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-//my custom services
+//my custom extentions
 builder.Services.AddCustomDbContext(builder.Configuration);
+// contains JWT Bearer validation, ITokenService and IUserRepository
 builder.Services.AddCustomAuthenticationWithServices(builder.Configuration);
 
 builder.Services.AddTransient<IGameRepository, GameRepository>();
@@ -70,16 +71,39 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
     app.UseDeveloperExceptionPage();
+
+    app.UseSwagger();
+
+    app.UseSwaggerUI();
+}
+else
+{
+    app.UseExceptionHandler("/Error");
+
+    app.UseHsts();
 }
 
-app.UseRouting();
+app.UseHttpsRedirection();
+
 app.UseStaticFiles();
-app.UseAuthentication();
-app.UseAuthorization();
+
+app.UseRouting();
+
 app.UseSession();
+
+app.UseAuthentication();
+
+app.UseAuthorization();
+
+app.UseResponseCaching();
+
+app.UseCors(options =>
+{
+    options.AllowAnyHeader();
+    options.AllowAnyMethod();
+    options.AllowAnyOrigin();
+});
 
 app.MapControllers();
 

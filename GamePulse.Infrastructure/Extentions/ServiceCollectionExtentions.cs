@@ -55,6 +55,8 @@ namespace GamePulse.Infrastructure.Extentions
                 });
             });
 
+            services.AddAuthorization();
+
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<ITokenService, JwtTokenService>();
         }

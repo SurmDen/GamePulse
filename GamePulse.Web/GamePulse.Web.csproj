@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MediatR" Version="13.1.0" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\GamePulse.Application\GamePulse.Application.csproj" />
     <ProjectReference Include="..\GamePulse.Core\GamePulse.Core.csproj" />
     <ProjectReference Include="..\GamePulse.Infrastructure\GamePulse.Infrastructure.csproj" />

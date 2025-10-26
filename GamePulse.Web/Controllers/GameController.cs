@@ -1,5 +1,8 @@
 ﻿using GamePulse.Application.Events;
+using GamePulse.Core.Entites;
+using GamePulse.Core.Interfaces.Repositories;
 using GamePulse.Core.Interfaces.Services;
+using GamePulse.Core.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,16 +13,21 @@ namespace GamePulse.Web.Controllers
     [ApiController]
     public class GameController : ControllerBase
     {
-        public GameController(ILogger<UserController> logger, IMediator mediator)
+        public GameController(ILogger<UserController> logger, IMediator mediator, IDateParser dateParser, IGameRepository gameRepository)
         {
+            _gameRepository = gameRepository;
             _logger = logger;
             _mediator = mediator;
+            _dateParser = dateParser;
         }
 
         private readonly ILogger<UserController> _logger;
         private readonly IMediator _mediator;
 
-        //[Authorize(Policy = "Bearer")]
+        private readonly IGameRepository _gameRepository;
+        private readonly IDateParser _dateParser;
+
+        [Authorize(Policy = "Bearer")]
         [HttpPost("load/{month:int}")]
         public async Task<IActionResult> LoadGamesAsync(int month)
         {

@@ -56,7 +56,7 @@ namespace GamePulse.Infrastructure.Repositories
 
                     var gameInfo = new GameInfo
                     {
-                        DateOfSearch = DateTime.Now.Date,
+                        DateOfSearch = DateTime.UtcNow.Date,
                         Game = game,
                         FollowersCount = Random.Shared.Next(0, 1000000)
                     };
@@ -70,7 +70,7 @@ namespace GamePulse.Infrastructure.Repositories
                         existingGame.GameName, existingGame.SteamAppGameId);
                     var gameInfo = new GameInfo
                     {
-                        DateOfSearch = DateTime.Now.Date,
+                        DateOfSearch = DateTime.UtcNow.Date,
                         Game = existingGame,
                         FollowersCount = Random.Shared.Next(0, 1000000)
                     };

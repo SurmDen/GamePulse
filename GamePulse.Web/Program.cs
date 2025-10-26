@@ -91,15 +91,32 @@ else
     app.UseExceptionHandler("/Error");
 
     app.UseHsts();
-}
 
-app.UseHttpsRedirection();
+    app.UseHttpsRedirection();
+}
 
 app.UseStaticFiles();
 
 app.UseRouting();
 
 app.UseSession();
+
+// Это сделано для удобства пользования Swagger, а так лучше хранить токен в JS
+app.Use(async (context, next) =>
+{
+    string? token = context.Session.GetString("token");
+
+    if (!string.IsNullOrEmpty(token))
+    {
+        context.Request.Headers.Authorization = ($"Bearer {token}");
+    }
+    else
+    {
+        context.Request.Headers.Authorization = "unauthorized";
+    }
+
+    await next.Invoke();
+});
 
 app.UseAuthentication();
 

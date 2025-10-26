@@ -68,23 +68,23 @@ namespace GamePulse.Infrastructure.Services
                                     Game game = new Game()
                                     {
                                         SteamAppGameId = steamGameData.AppId,
-                                        GameName = steamGameData.Name,
-                                        DateOfRelease = _dateParser.ParseDateFromString(steamGameData.ReleaseDate.Date),
-                                        ShopRef = steamGameData.Website,
-                                        ImageRef = steamGameData.HeaderImage,
-                                        ShortDescription = steamGameData.ShortDescription,
+                                        GameName = steamGameData.Name ?? "unnamed",
+                                        DateOfRelease = _dateParser.ParseDateFromString(steamGameData.ReleaseDate.Date).ToUniversalTime(),
+                                        ShopRef = steamGameData.Website ?? "none",
+                                        ImageRef = steamGameData.HeaderImage ?? "none",
+                                        ShortDescription = steamGameData.ShortDescription ?? "none",
                                         IsLinuxSupported = steamGameData.Platforms.Linux,
                                         IsMacSupported = steamGameData.Platforms.Mac,
                                         IsWindowsSupported = steamGameData.Platforms.Windows,
                                         Genres = new List<Genre>(steamGameData.Genres.Select(g => new Genre()
                                         {
                                             SteamAppGenreId = long.Parse(g.Id),
-                                            GenreName = g.Description
+                                            GenreName = g.Description ?? "none"
                                         })),
                                         Tags = new List<Tag>(steamGameData.Categories.Select(c => new Tag()
                                         {
                                             SteamAppTagId = c.Id,
-                                            TagName = c.Description
+                                            TagName = c.Description ?? "none"
                                         }))
                                     };
 
@@ -111,7 +111,7 @@ namespace GamePulse.Infrastructure.Services
                         _logger.LogWarning("HTTP request failed for game ID: {GameId}. Status: {StatusCode}", id, response.StatusCode);
                     }
 
-                    await Task.Delay(1000);
+                    await Task.Delay(300);
 
                     _httpClient.DefaultRequestHeaders.Remove("User-Agent");
                     _httpClient.DefaultRequestHeaders.Add("User-Agent",

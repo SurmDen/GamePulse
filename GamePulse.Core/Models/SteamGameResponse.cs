@@ -21,14 +21,11 @@ namespace GamePulse.Core.Models
         [JsonPropertyName("type")]
         public string? Type { get; set; }
 
-        [JsonPropertyName("is_free")]
-        public bool IsFree { get; set; }
-
         [JsonPropertyName("steam_appid")]
         public int AppId { get; set; }
 
         [JsonPropertyName("name")]
-        public string Name { get; set; } = string.Empty;
+        public string? Name { get; set; }
 
         [JsonPropertyName("release_date")]
         public ReleaseDate ReleaseDate { get; set; } = new();
@@ -46,13 +43,13 @@ namespace GamePulse.Core.Models
         public SupportInfo SupportInfo { get; set; } = new();
 
         [JsonPropertyName("short_description")]
-        public string ShortDescription { get; set; } = string.Empty;
+        public string? ShortDescription { get; set; } = string.Empty;
 
         [JsonPropertyName("header_image")]
-        public string HeaderImage { get; set; } = string.Empty;
+        public string? HeaderImage { get; set; } = string.Empty;
 
         [JsonPropertyName("website")]
-        public string Website { get; set; } = string.Empty;
+        public string? Website { get; set; } = string.Empty;
     }
 
     public class SupportInfo()
@@ -79,7 +76,7 @@ namespace GamePulse.Core.Models
         public string Id { get; set; } = string.Empty;
 
         [JsonPropertyName("description")]
-        public string Description { get; set; } = string.Empty;
+        public string? Description { get; set; } = string.Empty;
     }
 
     public class SteamCategory
@@ -88,7 +85,7 @@ namespace GamePulse.Core.Models
         public long Id { get; set; }
 
         [JsonPropertyName("description")]
-        public string Description { get; set; } = string.Empty;
+        public string? Description { get; set; } = string.Empty;
     }
 
     public class SteamPlatforms

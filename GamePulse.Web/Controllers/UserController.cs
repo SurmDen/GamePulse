@@ -4,6 +4,7 @@ using GamePulse.Application.Queries.User;
 using GamePulse.Core.Entites;
 using GamePulse.Core.Interfaces.Services;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GamePulse.Web.Controllers
@@ -56,6 +57,8 @@ namespace GamePulse.Web.Controllers
 
                 string token = _tokenService.GetToken(user);
 
+                HttpContext.Session.SetString("token", token);
+
                 return Ok( new {token = token, code = 200});
             }
             catch (Exception ex)
@@ -64,6 +67,15 @@ namespace GamePulse.Web.Controllers
 
                 return Problem(statusCode: 400, title: "Authoentication error", detail: "Please use correct data");
             }
+        }
+
+        [Authorize(Policy = "Bearer")]
+        [HttpGet("logout")]
+        public IActionResult LogOut()
+        {
+            HttpContext.Session.Remove("token");
+
+            return Ok(new { message = "success logout", code = 200 });
         }
     }
 }

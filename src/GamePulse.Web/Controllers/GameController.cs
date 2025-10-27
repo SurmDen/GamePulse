@@ -1,4 +1,5 @@
 ﻿using GamePulse.Application.Events;
+using GamePulse.Application.Queries.Game;
 using GamePulse.Core.Entites;
 using GamePulse.Core.Interfaces.Repositories;
 using GamePulse.Core.Interfaces.Services;
@@ -50,6 +51,66 @@ namespace GamePulse.Web.Controllers
                 _logger.LogError(ex, "Error occured while trying to send event");
 
                 return Problem(statusCode:400, title: "Event sending error", detail: "Error occured while trying to send event");
+            }
+        }
+
+        [Authorize(Policy = "Bearer")]
+        [HttpGet("calendar")]
+        public async Task<IActionResult> GetCalendarAsync([FromQuery] Guid? tag_id, [FromQuery] string? platform, [FromQuery] int month)
+        {
+            if (month < 1 || month > 12)
+            {
+                return BadRequest("Month must be between 1 and 12");
+            }
+
+            GetCalendarDataQuery query = new GetCalendarDataQuery()
+            {
+                TagId = tag_id,
+                Platform = platform,
+                Month = month
+            };
+
+            try
+            {
+                var calendarDto = await _mediator.Send(query);
+
+                return Ok(calendarDto);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occured while trying to get calendar data");
+
+                return Problem(statusCode: 400, title: "getting calendar data error", detail: "Error occured while trying to get calendar data");
+            }
+        }
+
+        [Authorize(Policy = "Bearer")]
+        [HttpGet]
+        public async Task<IActionResult> GetGamesInMonthAsync([FromQuery] Guid? tag_id, [FromQuery] string? platform, [FromQuery] int month)
+        {
+            if (month < 1 || month > 12)
+            {
+                return BadRequest("Month must be between 1 and 12");
+            }
+
+            GetGamesDataQuery query = new GetGamesDataQuery()
+            {
+                TagId = tag_id,
+                Platform = platform,
+                Month = month
+            };
+
+            try
+            {
+                var gamesDto = await _mediator.Send(query);
+
+                return Ok(gamesDto);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occured while trying to get games data");
+
+                return Problem(statusCode: 400, title: "getting games data error", detail: "Error occured while trying to get games data");
             }
         }
     }

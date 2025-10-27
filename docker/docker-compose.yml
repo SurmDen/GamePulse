@@ -44,10 +44,10 @@ services:
       timeout: 10s
       retries: 3
 
-  # Твой backend
+  # backend
   backend:
     build:
-      context: ../src/GamePulse.Web  # ← ИЗМЕНИЛ путь!
+      context: ..
       dockerfile: Dockerfile
     ports:
       - "5135:80"
@@ -61,7 +61,7 @@ services:
       kafka:
         condition: service_started
     volumes:
-      - ../src/GamePulse.Web/appsettings.Development.json:/app/appsettings.Development.json:ro  # ← ИЗМЕНИЛ путь!
+      - ../src/GamePulse.Web/appsettings.Development.json:/app/appsettings.Development.json:ro
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80/health"]
       interval: 30s

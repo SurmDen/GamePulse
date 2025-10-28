@@ -39,11 +39,11 @@ namespace GamePulse.Infrastructure.MessageBus
                 };
 
                 _consumer = new ConsumerBuilder<string, string>(config).Build();
-                _logger.LogInformation("✅ Kafka Consumer создан успешно");
+                _logger.LogInformation("Kafka Consumer создан успешно");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "❌ Ошибка создания Kafka Consumer");
+                _logger.LogError(ex, "Ошибка создания Kafka Consumer");
                 _consumer = null;
             }
         }
@@ -54,14 +54,14 @@ namespace GamePulse.Infrastructure.MessageBus
 
             if (_consumer == null)
             {
-                _logger.LogWarning("⚠️ Kafka Consumer не создан, сервис останавливается");
+                _logger.LogWarning("Kafka Consumer не создан, сервис останавливается");
                 return;
             }
 
             try
             {
                 _consumer.Subscribe("game-searching");
-                _logger.LogInformation("👂 Start consume for game-searching");
+                _logger.LogInformation("Start consume for game-searching");
 
                 while (!stoppingToken.IsCancellationRequested)
                 {
@@ -95,14 +95,14 @@ namespace GamePulse.Infrastructure.MessageBus
                     }
                     catch (ConsumeException ex)
                     {
-                        _logger.LogError(ex, "❌ Ошибка потребления сообщения");
+                        _logger.LogError(ex, "Ошибка потребления сообщения");
                         await Task.Delay(5000, stoppingToken);
                     }
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "❌ Критическая ошибка в Kafka Consumer");
+                _logger.LogError(ex, "Критическая ошибка в Kafka Consumer");
             }
             finally
             {

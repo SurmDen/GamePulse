@@ -83,7 +83,7 @@ git clone https://github.com/SurmDen/GamePulse.git
 cd GamePulse/Docker
 
 # Запуск всех сервисов (приложение + Kafka + PostgreSQL)
-docker-compose up -d
+docker-compose up --build
 ```
 ### 🚀 Первые шаги после запуска
 
